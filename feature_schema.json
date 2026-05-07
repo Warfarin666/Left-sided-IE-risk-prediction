@@ -1,1 +1,97 @@
-
+{
+  "model_name": "Left-sided Infective Endocarditis Risk Model",
+  "model_abbreviation": "LSIERM",
+  "model_version": "1.0.0",
+  "model_file": "catboost_model.cbm",
+  "model_type": "CatBoostClassifier",
+  "positive_class": "30-day adverse outcome",
+  "cutoff": 0.5,
+  "risk_group_rule": "Patients with predicted probability greater than or equal to the cutoff are classified as high risk.",
+  "features": [
+    {
+      "api_name": "TB",
+      "model_name": "TB",
+      "display_name": "Total bilirubin",
+      "unit": "μmol/L",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "NT_proBNP",
+      "model_name": "NT-proBNP",
+      "display_name": "N-terminal pro-B-type natriuretic peptide",
+      "unit": "pg/mL",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "WBC",
+      "model_name": "WBC",
+      "display_name": "White blood cell count",
+      "unit": "10^9/L",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "age",
+      "model_name": "age",
+      "display_name": "Age",
+      "unit": "years",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "urea",
+      "model_name": "urea",
+      "display_name": "Urea",
+      "unit": "mmol/L",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "CRP",
+      "model_name": "CRP",
+      "display_name": "C-reactive protein",
+      "unit": "mg/L",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "eGFR",
+      "model_name": "eGFR",
+      "display_name": "Estimated glomerular filtration rate",
+      "unit": "mL/min/1.73 m²",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "BMI",
+      "model_name": "BMI",
+      "display_name": "Body mass index",
+      "unit": "kg/m²",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "cTnT",
+      "model_name": "cTnT",
+      "display_name": "Cardiac troponin T",
+      "unit": "ng/mL",
+      "type": "number",
+      "required": true
+    },
+    {
+      "api_name": "PLT",
+      "model_name": "PLT",
+      "display_name": "Platelet count",
+      "unit": "10^9/L",
+      "type": "number",
+      "required": true
+    }
+  ],
+  "output": {
+    "predicted_probability": "Predicted probability of 30-day adverse outcome",
+    "risk_group": "High risk or Low risk according to the predefined cutoff"
+  },
+  "disclaimer": "This model is currently intended for research purposes only and should not replace clinical judgment."
+}
