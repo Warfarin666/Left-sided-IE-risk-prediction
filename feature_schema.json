@@ -34,7 +34,7 @@
     },
     {
       "api_name": "age",
-      "model_name": "age",
+      "model_name": "Age",
       "display_name": "Age",
       "unit": "years",
       "type": "number",
@@ -42,7 +42,7 @@
     },
     {
       "api_name": "urea",
-      "model_name": "urea",
+      "model_name": "Urea",
       "display_name": "Urea",
       "unit": "mmol/L",
       "type": "number",
