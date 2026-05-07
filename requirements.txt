@@ -1,7 +1,4 @@
-fastapi
-uvicorn[standard]
+streamlit
 catboost
 pandas
 numpy
-pydantic
-python-multipart
