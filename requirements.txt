@@ -4,3 +4,4 @@ catboost
 pandas
 numpy
 pydantic
+python-multipart
