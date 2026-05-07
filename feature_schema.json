@@ -2,7 +2,7 @@
   "model_name": "Left-sided Infective Endocarditis Risk Model",
   "model_abbreviation": "LSIERM",
   "model_version": "1.0.0",
-  "model_file": "catboost_model.cbm",
+  "model_file": "catboost_train_ro_final.cbm",
   "model_type": "CatBoostClassifier",
   "positive_class": "30-day adverse outcome",
   "cutoff": 0.5,
