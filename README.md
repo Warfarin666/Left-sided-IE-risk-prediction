@@ -1,1 +1,5 @@
+# Left-sided Infective Endocarditis Risk Prediction Model
 
+This repository provides an online deployment framework for a CatBoost-based prediction model for left-sided infective endocarditis.
+
+The model is designed to estimate the probability of 30-day outcomes in patients with left-sided infective endocarditis and to classify patients into high-risk or low-risk groups according to a predefined cutoff.
