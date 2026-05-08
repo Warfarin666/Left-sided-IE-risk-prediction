@@ -4,7 +4,7 @@
   "model_version": "1.0.0",
   "model_file": "catboost_train_ro_final.cbm",
   "model_type": "CatBoostClassifier",
-  "positive_class": "30-day adverse outcome",
+  "positive_class": "30-day outcome after surgery",
   "cutoff": 0.5,
   "risk_group_rule": "Patients with predicted probability greater than or equal to the cutoff are classified as high risk.",
   "features": [
