@@ -2,3 +2,5 @@ streamlit
 catboost
 pandas
 numpy
+shap
+matplotlib
