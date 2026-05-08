@@ -5,9 +5,7 @@ import os
 from catboost import CatBoostClassifier
 
 
-# =========================================================
-# 1. Page configuration
-# =========================================================
+# 1. Page configuration====================================
 st.set_page_config(
     page_title="Left-sided IE Risk Prediction",
     page_icon="🫀",
@@ -15,16 +13,12 @@ st.set_page_config(
 )
 
 
-# =========================================================
-# 2. Basic paths
-# =========================================================
+# 2. Basic paths===========================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCHEMA_PATH = os.path.join(BASE_DIR, "feature_schema.json")
 
 
-# =========================================================
-# 3. Load schema
-# =========================================================
+# 3. Load schema===========================================
 @st.cache_data
 def load_schema():
     with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
@@ -40,9 +34,7 @@ CUTOFF = float(schema.get("cutoff", 0.5))
 FEATURES = schema["features"]
 
 
-# =========================================================
-# 4. Load CatBoost model
-# =========================================================
+# 4. Load CatBoost model===================================
 @st.cache_resource
 def load_model():
     model = CatBoostClassifier()
@@ -53,16 +45,13 @@ def load_model():
 model = load_model()
 
 
-# =========================================================
-# 5. Get true feature order from CatBoost model
-# =========================================================
+# 5. Get true feature order from CatBoost model============
 MODEL_FEATURE_NAMES = list(model.feature_names_)
 
 if not MODEL_FEATURE_NAMES:
     MODEL_FEATURE_NAMES = [item["model_name"] for item in FEATURES]
 
 
-# Build mapping from model feature name to schema item
 SCHEMA_BY_MODEL_NAME = {
     item["model_name"]: item for item in FEATURES
 }
@@ -81,31 +70,25 @@ if missing_features_in_schema:
     st.stop()
 
 
-# Reorder features according to the model's internal feature order
 FEATURES_ORDERED = [
     SCHEMA_BY_MODEL_NAME[f] for f in MODEL_FEATURE_NAMES
 ]
 
 
-# =========================================================
-# 6. Header
-# =========================================================
+# 6. Header================================================
 st.title("Left-sided Infective Endocarditis Risk Prediction Model")
 
 st.markdown(
     f"""
-    This web calculator estimates the probability of **{schema.get("positive_class", "30-day adverse outcome")}**
-    using a CatBoost-based prediction model.
+    This web calculator estimates the probability of **{schema.get("positive_class", "outcomes within 30 days after surgery")}**
+    for patients with left-sided infective endocarditis using a CatBoost-based prediction model.
 
     **Model version:** {schema.get("model_version", "1.0.0")}  
-    **Cutoff:** {CUTOFF}
     """
 )
 
 
-# =========================================================
-# 7. Input form
-# =========================================================
+# 7. Input form============================================
 st.subheader("Input Clinical Variables")
 
 input_values = {}
@@ -122,17 +105,16 @@ with st.form("prediction_form"):
 
         input_values[api_name] = st.number_input(
             label,
-            value=0.0,
-            step=0.1,
-            format="%.4f"
+            min_value=0.00,
+            value=0.00,
+            step=0.01,
+            format="%.2f"
         )
 
-    submitted = st.form_submit_button("Predict Risk")
+    submitted = st.form_submit_button("Predict Surgical Risk")
 
 
-# =========================================================
-# 8. Prediction
-# =========================================================
+# 8. Prediction============================================
 if submitted:
     row = {}
 
@@ -142,7 +124,6 @@ if submitted:
 
         row[model_feature_name] = float(input_values[api_name])
 
-    # Important: dataframe columns must follow the model's internal feature order
     df = pd.DataFrame(
         [[row[f] for f in MODEL_FEATURE_NAMES]],
         columns=MODEL_FEATURE_NAMES
@@ -171,55 +152,34 @@ if submitted:
 
         if risk_group == "High risk":
             st.error(
-                f"The predicted probability is {probability_percent:.2f}%, "
-                f"which is greater than or equal to the cutoff of {CUTOFF}."
+                f"The predicted probability of 30-day outcomes is "
+                f"{probability_percent:.2f}%. This result suggests that the patient "
+                f"may have a higher predicted surgical risk."
             )
         else:
             st.success(
-                f"The predicted probability is {probability_percent:.2f}%, "
-                f"which is lower than the cutoff of {CUTOFF}."
+                f"The predicted probability of 30-day adverse outcomes is "
+                f"{probability_percent:.2f}%. This result suggests that the patient "
+                f"may have a lower predicted surgical risk."
             )
-
-        with st.expander("Show model input details"):
-            st.dataframe(df, use_container_width=True)
+        st.warning(
+            "This result is intended for research and reference only "
+            "and should not replace clinical decision-making."
+        )
 
     except Exception as e:
-        st.error("Prediction failed. Please check whether feature names and feature order match the training data.")
+        st.error(
+            "Prediction failed. Please check whether feature names and feature order "
+            "match the training data."
+        )
         st.exception(e)
 
 
-# =========================================================
-# 9. Feature information
-# =========================================================
-with st.expander("Required predictors and model feature order"):
-    feature_table = pd.DataFrame([
-        {
-            "Order in model": i + 1,
-            "API variable": item["api_name"],
-            "Model variable": item["model_name"],
-            "Clinical variable": item["display_name"],
-            "Unit": item.get("unit", "")
-        }
-        for i, item in enumerate(FEATURES_ORDERED)
-    ])
-
-    st.dataframe(feature_table, use_container_width=True)
-
-
-# =========================================================
-# 10. Model internal feature names
-# =========================================================
-with st.expander("Model internal feature names"):
-    st.write(MODEL_FEATURE_NAMES)
-
-
-# =========================================================
-# 11. Disclaimer
-# =========================================================
+# 9. Disclaimer============================================
 st.markdown("---")
 st.caption(
     schema.get(
         "disclaimer",
-        "This model is intended for research and clinical decision-support purposes only and should not replace clinical judgment."
+        "This model is intended for research and reference only and should not replace clinical decision-making."
     )
 )
