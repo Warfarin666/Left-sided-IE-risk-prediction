@@ -115,9 +115,10 @@ with st.form("prediction_form"):
         input_values[api_name] = st.number_input(
             label,
             min_value=0.00,
-            value=0.00,
+            value=None,
             step=0.01,
-            format="%.2f"
+            format="%.2f",
+            placeholder="Enter value"
         )
 
     submitted = st.form_submit_button("Predict Surgical Risk")
@@ -127,11 +128,23 @@ with st.form("prediction_form"):
 if submitted:
     row = {}
 
+    missing_input_features = []
+
     for model_feature_name in MODEL_FEATURE_NAMES:
         item = SCHEMA_BY_MODEL_NAME[model_feature_name]
         api_name = item["api_name"]
 
-        row[model_feature_name] = float(input_values[api_name])
+        if input_values[api_name] is None:
+            missing_input_features.append(item["display_name"])
+        else:
+            row[model_feature_name] = float(input_values[api_name])
+
+    if missing_input_features:
+        st.error(
+            "Please complete all required clinical variables before prediction: "
+            + ", ".join(missing_input_features)
+        )
+        st.stop()
 
     df = pd.DataFrame(
         [[row[f] for f in MODEL_FEATURE_NAMES]],
