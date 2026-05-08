@@ -219,6 +219,11 @@ if submitted:
         fig = plt.gcf()
         st.pyplot(fig, clear_figure=True)
         plt.close(fig)
+
+        st.caption(
+            "Reference: Lundberg SM, Lee S-I. A unified approach to interpreting "
+            "model predictions. Advances in Neural Information Processing Systems. 2017."
+        )
         
     except Exception as e:
         st.error(
