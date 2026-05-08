@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import json
 import os
+import shap
+import matplotlib.pyplot as plt
 from catboost import CatBoostClassifier
 
 
@@ -34,7 +36,7 @@ CUTOFF = float(schema.get("cutoff", 0.5))
 FEATURES = schema["features"]
 
 
-# 4. Load CatBoost model===================================
+# 4. Load CatBoost model and SHAP explainer================
 @st.cache_resource
 def load_model():
     model = CatBoostClassifier()
@@ -43,6 +45,13 @@ def load_model():
 
 
 model = load_model()
+
+@st.cache_resource
+def load_explainer(_model):
+    return shap.TreeExplainer(_model)
+
+
+explainer = load_explainer(model)
 
 
 # 5. Get true feature order from CatBoost model============
@@ -166,7 +175,51 @@ if submitted:
             "This result is intended for research and reference only "
             "and should not replace clinical decision-making."
         )
+                # SHAP waterfall plot==============================
+        st.subheader("Individual Risk Explanation by SHAP")
 
+        st.markdown(
+            """
+            The SHAP waterfall plot shows how each predictor contributes to the
+            model output for this individual patient. Features that push the
+            model output upward increase the predicted risk, whereas features
+            that push the model output downward decrease the predicted risk.
+
+            The plot is intended to support model interpretation and should not
+            replace clinical judgment or clinical decision-making.
+            """
+        )
+
+        shap_values = explainer(df)
+
+        display_feature_names = [
+            SCHEMA_BY_MODEL_NAME[f]["display_name"]
+            for f in MODEL_FEATURE_NAMES
+        ]
+
+        if hasattr(shap_values.base_values, "__len__"):
+            base_value = shap_values.base_values[0]
+        else:
+            base_value = shap_values.base_values
+
+        shap_explanation = shap.Explanation(
+            values=shap_values.values[0],
+            base_values=base_value,
+            data=df.iloc[0].values,
+            feature_names=display_feature_names
+        )
+
+        plt.figure(figsize=(10, 6))
+        shap.plots.waterfall(
+            shap_explanation,
+            max_display=10,
+            show=False
+        )
+
+        fig = plt.gcf()
+        st.pyplot(fig, clear_figure=True)
+        plt.close(fig)
+        
     except Exception as e:
         st.error(
             "Prediction failed. Please check whether feature names and feature order "
