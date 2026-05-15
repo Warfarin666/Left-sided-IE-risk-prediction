@@ -174,7 +174,7 @@ if submitted:
 
         if risk_group == "High risk":
             st.error(
-                f"The predicted probability of 30-day outcomes is "
+                f"The predicted probability of 30-day adverse outcomes is "
                 f"{probability_percent:.2f}%. This result suggests that the patient "
                 f"may have a higher predicted surgical risk."
             )
