@@ -155,7 +155,10 @@ if submitted:
         probability_percent = probability * 100
 
         st.subheader("Prediction Result")
-        
+        st.metric(
+            label="Predicted probability",
+            value=f"{probability_percent:.2f}%"
+        )
         st.warning(
             "This result is intended for research and reference only "
             "and should not replace clinical decision-making."
