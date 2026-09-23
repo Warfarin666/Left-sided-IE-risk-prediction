@@ -22,7 +22,6 @@ with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
 MODEL_FILE = schema.get("model_file", "catboost_model.cbm")
 MODEL_PATH = os.path.join(BASE_DIR, MODEL_FILE)
 
-CUTOFF = float(schema.get("cutoff", 0.5))
 FEATURES = schema["features"]
 
 API_FEATURE_NAMES = [item["api_name"] for item in FEATURES]
@@ -160,8 +159,7 @@ def home():
         <div class="container">
             <h1>{schema.get("model_name")}</h1>
             <div class="subtitle">
-                Model version: {schema.get("model_version")} |
-                Cutoff: {CUTOFF}
+                Model version: {schema.get("model_version")} 
             </div>
 
             {feature_inputs}
@@ -212,13 +210,9 @@ def home():
                     return;
                 }}
 
-                const riskClass = data.risk_group === "High risk" ? "high" : "low";
-
                 resultDiv.innerHTML = `
                     <h3>Prediction Result</h3>
                     <p><strong>Predicted probability:</strong> ${{data.predicted_probability_percent}}%</p>
-                    <p><strong>Cutoff:</strong> ${{data.cutoff}}</p>
-                    <p><strong>Risk group:</strong> <span class="${{riskClass}}">${{data.risk_group}}</span></p>
                     <p><strong>Positive class:</strong> ${{data.positive_class}}</p>
                 `;
             }}
@@ -246,7 +240,6 @@ def get_features():
         "model_name": schema.get("model_name"),
         "model_abbreviation": schema.get("model_abbreviation"),
         "model_version": schema.get("model_version"),
-        "cutoff": CUTOFF,
         "features": FEATURES
     }
 
