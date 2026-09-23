@@ -32,7 +32,6 @@ schema = load_schema()
 MODEL_FILE = schema.get("model_file", "catboost_train_ro_final.cbm")
 MODEL_PATH = os.path.join(BASE_DIR, MODEL_FILE)
 
-CUTOFF = float(schema.get("cutoff", 0.5))
 FEATURES = schema["features"]
 
 
@@ -154,36 +153,9 @@ if submitted:
     try:
         probability = float(model.predict_proba(df)[0][1])
         probability_percent = probability * 100
-        risk_group = "High risk" if probability >= CUTOFF else "Low risk"
 
         st.subheader("Prediction Result")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.metric(
-                label="Predicted probability",
-                value=f"{probability_percent:.2f}%"
-            )
-
-        with col2:
-            st.metric(
-                label="Risk group",
-                value=risk_group
-            )
-
-        if risk_group == "High risk":
-            st.error(
-                f"The predicted probability of 30-day adverse outcomes is "
-                f"{probability_percent:.2f}%. This result suggests that the patient "
-                f"may have a higher predicted surgical risk."
-            )
-        else:
-            st.success(
-                f"The predicted probability of 30-day adverse outcomes is "
-                f"{probability_percent:.2f}%. This result suggests that the patient "
-                f"may have a lower predicted surgical risk."
-            )
+        
         st.warning(
             "This result is intended for research and reference only "
             "and should not replace clinical decision-making."
